@@ -6,60 +6,65 @@ import Inline from "aws-northstar/layouts/Inline";
 import { useHistory } from "react-router";
 import Badge from 'aws-northstar/components/Badge';
 
-function DataDomains({ match }) {
+function OntologyAttributes({ match }) {
   const { path } = match;
-  const [dataDomains, setDataDomains] = useState(null);
-  const [selectedUser, setSelectedDataDomains] = useState(null);
+  const [dataProducts, setDataProducts] = useState(null);
+  const [selectedDataProduct, setSelectedDataProduct] = useState(null);
   const history = useHistory();
 
   const columnDefinitions = [
     {
       id: "name",
-      width: 200,
+      width: 150,
       Header: "Name",
-      accessor: "name"
+      accessor: "name",
     },
     {
       id: "description",
-      width: 500,
+      width: 300,
       Header: "Description",
       accessor: "description",
     },
     {
-      id: "dataStoreNames",
-      width: 200,
-      Header: "Data Store Names",
-      accessor: "dataStoreNames",
+      id: "domain",
+      width: 150,
+      Header: "Domain",
+      accessor: "domain"
+    },
+    {
+      id: "dataStore",
+      width: 150,
+      Header: "Data Store",
+      accessor: "dataStore"
+    },
+    {
+      id: "owner",
+      width: 100,
+      Header: "Owner",
+      accessor: "owner",
+    },
+    {
+      id: "searchTerms",
+      width: 300,
+      Header: "Synonyms",
+      accessor: "searchTerms",
       Cell: ({ row  }) => {
         if (row && row.original) {
-            const list = row.original.dataStores;
-            return list.map( obj => {return <Badge content={obj.name}/>} );
+            const status = row.original.searchTerms;
+            return status.map( function(obj) {return <Badge content={obj.name} />} );
         }
         return null;
-      },
+      }  
     },
-      {
-        id: "dataStoreTypes",
-        width: 200,
-        Header: "Data Store Types",
-        accessor: "dataStoreTypes",
-        Cell: ({ row  }) => {
-          if (row && row.original) {
-              const list = row.original.dataStores;
-              return list.map( obj => {return <Badge content={obj.type}/>} );
-          }
-          return null;
-        } 
-      } 
   ];
 
   const handleEdit = () => {
-    history.push(`/dataDomains/edit/${selectedUser[0].id}`);
+    history.push(`/dataProducts/edit/${selectedDataProduct[0].id}`);
   };
 
   const handleCreate = () => {
     alert("Create button clicked");
-    history.push(`/dataDomains/edit`);
+    history.push(`/dataProducts/edit`);
   };
 
   const tableActions = (
@@ -69,26 +74,26 @@ function DataDomains({ match }) {
         Edit
       </Button>
       <Button variant="primary" onClick={handleCreate}>
-        Add
+        Register
       </Button>
     </Inline>
   );
 
   useEffect(() => {
-    Service.getAll('businessDomains').then((result) => setDataDomains(result.data));
+    Service.getAll('dataProducts').then((result) => setDataProducts(result.data));
   }, []);
 
   return (
     <Table
       actionGroup={tableActions}
-      tableTitle="List of Business Domains"
+      tableTitle="List of Data Products"
       multiSelect={false}
       columnDefinitions={columnDefinitions}
-      items={dataDomains}
-      onSelectionChange={setSelectedDataDomains}
+      items={dataProducts}
+      onSelectionChange={setSelectedDataProduct}
       getRowId={React.useCallback((data) => data.id, [])}
     />
   );
 }
 
-export default DataDomains;
+export default OntologyAttributes;

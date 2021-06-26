@@ -43,12 +43,12 @@ const AppLayout = ({ children }) => {
           { text: "Home", type: SideNavigationItemType.LINK, href: "/" },
           { text: "Users", type: SideNavigationItemType.LINK, href: "/users" },
           { text: "Roles", type: SideNavigationItemType.LINK, href: "/roles" },
-          { text: "Data Domains", type: SideNavigationItemType.LINK, href: "/dataDomains" },
+          { text: "Business Domains", type: SideNavigationItemType.LINK, href: "/dataDomains" },
           { text: "DGaC Constructs", type: SideNavigationItemType.LINK, href: "/dgac" },
           { text: "Business Ontology", type: SideNavigationItemType.LINK, href: "/ontologyAttributes" },
 
           { type: SideNavigationItemType.DIVIDER },
-          { text: "Data Products", type: SideNavigationItemType.LINK, href: "/dataDomains" },
+          { text: "Data Products", type: SideNavigationItemType.LINK, href: "/dataProducts" },
           { type: SideNavigationItemType.DIVIDER },
           { text: "Query Workbench", type: SideNavigationItemType.LINK, href: "/query" },
           { type: SideNavigationItemType.DIVIDER },
@@ -61,7 +61,7 @@ const AppLayout = ({ children }) => {
           {
             type: SideNavigationItemType.LINK,
             text: "Documentation",
-            href: "https://docs.aws.amazon.com",
+            href: "https://amazon.awsapps.com/workdocs/index.html#/document/362ef575ee7816b87d8361adc4cf7a4ad0374f1a24877bd537c7d6bffb77faa3",
           },
         ]}
       ></SideNavigationBase>

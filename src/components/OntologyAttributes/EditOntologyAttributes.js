@@ -7,20 +7,22 @@ import FormRenderer, {
   componentTypes,
   validatorTypes,
 } from "aws-northstar/components/FormRenderer";
-import Container from 'aws-northstar/layouts/Container';
-import ColumnLayout, { Column } from 'aws-northstar/layouts/ColumnLayout';
-import Stack from 'aws-northstar/layouts/Stack';
-import KeyValuePair from 'aws-northstar/components/KeyValuePair';
-import Badge from 'aws-northstar/components/Badge';
-import Inline from 'aws-northstar/layouts/Inline';
-import StatusIndicator from 'aws-northstar/components/StatusIndicator';
-import Text from 'aws-northstar/components/Text';
-
+import Container from "aws-northstar/layouts/Container";
+import ColumnLayout, { Column } from "aws-northstar/layouts/ColumnLayout";
+import Stack from "aws-northstar/layouts/Stack";
+import KeyValuePair from "aws-northstar/components/KeyValuePair";
+import Badge from "aws-northstar/components/Badge";
+import Inline from "aws-northstar/layouts/Inline";
+import StatusIndicator from "aws-northstar/components/StatusIndicator";
+import Text from "aws-northstar/components/Text";
 
 function EditOntologyAttributes({ match }) {
   const { path } = match;
   const [ontologyAttribute, setOntologyAttribute] = useState(null);
   const [roleOptions, setRoleOptions] = useState(null);
+  const [roles, setRoles] = useState([]);
+  const [dgacs, setDgacs] = useState([]);
+
   const [dgacPrivacyOptions, setDgacPrivacyOptions] = useState(null);
   const [dgacQualityOptions, setDgacQualityOptions] = useState(null);
   const history = useHistory();
@@ -32,24 +34,30 @@ function EditOntologyAttributes({ match }) {
     );
 
     let tempRoleOptions = [];
-    Service.getAll("roles").then((result) =>
+    let allRoles = {};
+    Service.getAll("roles").then((result) => {
       result.data.map((thisRole) => {
         let item = {};
         item["value"] = thisRole.id;
         item["label"] = thisRole.name;
         tempRoleOptions.push(item);
+        allRoles[thisRole.id] = thisRole.name;
         setRoleOptions(tempRoleOptions);
-      })
-    );
+        setRoles(allRoles);
+      });
+    });
 
     let tempDgacOptions = [];
     let tempDgacQualityOptions = [];
 
-    Service.getAll("dgac").then((result) =>
+    Service.getAll("dgac").then((result) => {
+      let allDgacs = {};
       result.data.map((thisDgac) => {
         let item = {};
         item["value"] = thisDgac.id;
         item["label"] = thisDgac.name;
+        allDgacs[thisDgac.id] = thisDgac.name;;
+        setDgacs(allDgacs);
         if (thisDgac.category === "Privacy") {
           tempDgacOptions.push(item);
           setDgacPrivacyOptions(tempDgacOptions);
@@ -57,8 +65,8 @@ function EditOntologyAttributes({ match }) {
           tempDgacQualityOptions.push(item);
           setDgacQualityOptions(tempDgacQualityOptions);
         }
-      })
-    );
+      });
+    });
   }, []);
 
   const onSubmit = async (params) => {
@@ -67,9 +75,7 @@ function EditOntologyAttributes({ match }) {
       params,
       params.id
     );
-    console.log(success);
-    if (success.status === 200) 
-        history.push(`/ontologyAttributes`);
+    if (success.status === 200) history.push(`/ontologyAttributes`);
   };
 
   const onCancel = () => {
@@ -78,91 +84,121 @@ function EditOntologyAttributes({ match }) {
 
   const synonyms = (jsonData) => {
     return (
-    <Inline>
-    {jsonData['synonyms'].map( ( obj ) => {return <Badge content={obj.name} />} ) }
-    </Inline>
+      <Inline>
+        {jsonData["synonyms"].map((obj) => {
+          return <Badge content={obj.name} />;
+        })}
+      </Inline>
     );
-  }
+  };
 
   const domains = (jsonData) => {
     return (
-    <Inline>
-    {jsonData['domains'].map( ( obj ) => {return <Badge content={obj} />} ) }
-    </Inline>
+      <Inline>
+        {jsonData["domains"].map((obj) => {
+          return <Badge content={obj} />;
+        })}
+      </Inline>
     );
-  }
+  };
 
   const statusInd = (status) => {
-    if( status == true )
-      return <StatusIndicator  statusType='positive'></StatusIndicator>;
-    else
-      return <StatusIndicator  statusType='negative'></StatusIndicator>;  
-  }
+    if (status == true)
+      return <StatusIndicator statusType="positive"></StatusIndicator>;
+    else return <StatusIndicator statusType="negative"></StatusIndicator>;
+  };
 
-  const privactRules = (jsonData, valueName) => {
-    if(jsonData != null && Object.keys(jsonData).length > 0)
-        return jsonData.map( ( obj ) => {return <KeyValuePair label={obj['roles']} value={obj[valueName]}></KeyValuePair> });
-    else
-        return;    
-  }
+  const privacyRules = (jsonData, valueName) => {
+    if (jsonData != null && Object.keys(jsonData).length > 0)
+      return jsonData.map((obj) => {
+        return (
+          <KeyValuePair
+            label={roles[obj["roles"]]}
+            value={<Badge content={dgacs[obj[valueName]] != null ? dgacs[obj[valueName]] : obj[valueName]}/>}
+          ></KeyValuePair>
+        );
+      });
+    else return;
+  };
 
   const qualityRules = (jsonData) => {
-    if(jsonData != null && Object.keys(jsonData).length > 0)
-        return jsonData.map( ( obj ) => {return <KeyValuePair label={obj.label} value=' '></KeyValuePair>});
-    else
-        return;    
-  }
+    if (jsonData != null && Object.keys(jsonData).length > 0)
+      return jsonData.map((obj) => {
+        return <KeyValuePair label={obj.label} value=" "></KeyValuePair>;
+      });
+    else return;
+  };
 
   const ReviewTemplate = (data) => {
-    let jsonData = data['data'];
+    let jsonData = data["data"];
     return (
       <Stack>
-      <Container>
-        <ColumnLayout>
-          <Column>
-            <Stack>
-              <KeyValuePair label="Id" value={jsonData['id']}></KeyValuePair>
-              <KeyValuePair label="Name" value={jsonData['name']}></KeyValuePair>
-              <KeyValuePair label="Description" value={jsonData['description']}></KeyValuePair>
-              <KeyValuePair label="Type" value={jsonData['type']}></KeyValuePair>
-            </Stack>
-           </Column> 
-          <Column>
-            <Stack>
-              <KeyValuePair label="Synonyms" value={synonyms(jsonData)}></KeyValuePair>
-              <KeyValuePair label="Domains" value={domains(jsonData)}></KeyValuePair>
-              <KeyValuePair label="PII" value={statusInd(jsonData['PII'])}></KeyValuePair>
-              <KeyValuePair label="Governed" value={statusInd(jsonData['governed'])}></KeyValuePair>
-            </Stack>
-           </Column> 
-        </ColumnLayout>
-      </Container>
-      <Container>
-        <ColumnLayout>
-          <Column>
-            <Stack>
-              <Text>DGaC - Column Masking</Text>
-              {privactRules(jsonData['DGac']['columnMasking'], 'dgac')}
-            </Stack>
-           </Column> 
-          <Column>
-            <Stack>
-              <Text>DGaC - Row Filtering</Text>
-              {privactRules(jsonData['DGac']['rowFiltering'], 'filterValues')}
-            </Stack>
-           </Column> 
-           <Column>
-            <Stack>
-              <Text>DGaC - Quality</Text>
-              {qualityRules(jsonData['DGac']['quality'])}
-            </Stack>
-           </Column> 
-        </ColumnLayout>
-      </Container>
+        <Container>
+          <ColumnLayout>
+            <Column>
+              <Stack>
+                <KeyValuePair label="Id" value={jsonData["id"]}></KeyValuePair>
+                <KeyValuePair
+                  label="Name"
+                  value={jsonData["name"]}
+                ></KeyValuePair>
+                <KeyValuePair
+                  label="Description"
+                  value={jsonData["description"]}
+                ></KeyValuePair>
+                <KeyValuePair
+                  label="Type"
+                  value={jsonData["type"]}
+                ></KeyValuePair>
+              </Stack>
+            </Column>
+            <Column>
+              <Stack>
+                <KeyValuePair
+                  label="Synonyms"
+                  value={synonyms(jsonData)}
+                ></KeyValuePair>
+                <KeyValuePair
+                  label="Domains"
+                  value={domains(jsonData)}
+                ></KeyValuePair>
+                <KeyValuePair
+                  label="PII"
+                  value={statusInd(jsonData["PII"])}
+                ></KeyValuePair>
+                <KeyValuePair
+                  label="Governed"
+                  value={statusInd(jsonData["governed"])}
+                ></KeyValuePair>
+              </Stack>
+            </Column>
+          </ColumnLayout>
+        </Container>
+        <Container>
+          <ColumnLayout>
+            <Column>
+              <Stack>
+                <Text>DGaC - Column Masking</Text>
+                {privacyRules(jsonData["DGac"]["columnMasking"], "dgac")}
+              </Stack>
+            </Column>
+            <Column>
+              <Stack>
+                <Text>DGaC - Row Filtering</Text>
+                {privacyRules(jsonData["DGac"]["rowFiltering"], "filterValues")}
+              </Stack>
+            </Column>
+            <Column>
+              <Stack>
+                <Text>DGaC - Quality</Text>
+                {qualityRules(jsonData["DGac"]["quality"])}
+              </Stack>
+            </Column>
+          </ColumnLayout>
+        </Container>
       </Stack>
     );
   };
-  
 
   const schema = {
     fields: [
