@@ -28,9 +28,9 @@ function EditDataDomain({ match }) {
         item["value"] = thisType.id;
         item["label"] = thisType.name;
         sourceValues.push(item);
-        setSourceTypes(sourceValues);
       });
     });
+    setSourceTypes(sourceValues);
   }, []);
 
   const schema = {
@@ -91,6 +91,12 @@ function EditDataDomain({ match }) {
             options: sourceTypes,
             multiSelect: false,
             checkboxes: false,
+            isRequired: true,
+            validate: [
+                {
+                    type: validatorTypes.REQUIRED,
+                },
+            ],
           },
           {
             component: componentTypes.TEXT_FIELD,

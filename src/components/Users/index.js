@@ -81,7 +81,7 @@ function Users({ match }) {
   );
 
   useEffect(() => {
-    Service.getAll('users').then((result) => setUsers(result.data));
+   Service.getAll('users').then((result) => setUsers(result.data)); 
   }, []);
 
   return (

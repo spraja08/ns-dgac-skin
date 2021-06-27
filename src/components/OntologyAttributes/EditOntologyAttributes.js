@@ -18,13 +18,13 @@ import Text from "aws-northstar/components/Text";
 
 function EditOntologyAttributes({ match }) {
   const { path } = match;
-  const [ontologyAttribute, setOntologyAttribute] = useState(null);
-  const [roleOptions, setRoleOptions] = useState(null);
+  const [ontologyAttribute, setOntologyAttribute] = useState([]);
+  const [roleOptions, setRoleOptions] = useState([]);
   const [roles, setRoles] = useState([]);
   const [dgacs, setDgacs] = useState([]);
 
-  const [dgacPrivacyOptions, setDgacPrivacyOptions] = useState(null);
-  const [dgacQualityOptions, setDgacQualityOptions] = useState(null);
+  const [dgacPrivacyOptions, setDgacPrivacyOptions] = useState([]);
+  const [dgacQualityOptions, setDgacQualityOptions] = useState([]);
   const history = useHistory();
   const { ontologyAttributeId } = useParams();
 

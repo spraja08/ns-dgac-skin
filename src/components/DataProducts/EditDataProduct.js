@@ -139,9 +139,8 @@ function EditDataProduct({ match }) {
     if (jsonData != null && Object.keys(jsonData).length > 0)
       return jsonData.map((obj) => {
         return (
-          <KeyValuePair
-            label={roles[obj["roles"]]}
-            value={
+          <Inline>
+          <Text>{roles[obj["roles"]]}</Text>
               <Badge
                 content={
                   dgacs[obj[valueName]] != null
@@ -149,8 +148,7 @@ function EditDataProduct({ match }) {
                     : obj[valueName]
                 }
               />
-            }
-          ></KeyValuePair>
+          </Inline>
         );
       });
     else return;
@@ -191,6 +189,7 @@ function EditDataProduct({ match }) {
             <Column>
               <Stack>
                 <KeyValuePair label="Id" value={jsonData["id"]}></KeyValuePair>
+                <KeyValuePair label="Fully Qualified Name" value={jsonData["fqn"]}></KeyValuePair>
                 <KeyValuePair
                   label="Name"
                   value={jsonData["name"]}
@@ -262,6 +261,16 @@ function EditDataProduct({ match }) {
                 component: componentTypes.TEXT_FIELD,
                 name: "id",
                 label: "ID",
+                validate: [
+                  {
+                    type: validatorTypes.REQUIRED,
+                  },
+                ],
+              },
+              {
+                component: componentTypes.TEXT_FIELD,
+                name: "fqn",
+                label: "Fully Qualified Name",
                 validate: [
                   {
                     type: validatorTypes.REQUIRED,
